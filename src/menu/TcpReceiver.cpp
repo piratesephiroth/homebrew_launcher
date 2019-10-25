@@ -29,8 +29,10 @@ TcpReceiver::TcpReceiver(int port)
 TcpReceiver::~TcpReceiver()
 {
     exitRequested = true;
+    ICInvalidateRange((void*)&exitRequested, sizeof(exitRequested));
+    DCFlushRange((void*)&exitRequested, sizeof(exitRequested));
 
-    if(serverSocket > 0)
+    if(serverSocket >= 0)
     {
         shutdown(serverSocket, SHUT_RDWR);
     }
@@ -41,6 +43,9 @@ void TcpReceiver::executeThread()
 	serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 	if (serverSocket < 0)
 		return;
+
+    ICInvalidateRange((void*)&serverSocket, sizeof(serverSocket));
+    DCFlushRange((void*)&serverSocket, sizeof(serverSocket));
 
     u32 enable = 1;
 	setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));

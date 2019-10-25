@@ -29,10 +29,10 @@ AsyncDeleter::~AsyncDeleter()
     exitApplication = true;
 }
 
-void AsyncDeleter::triggerDeleteProcess(void)
-{
-    if(!deleterInstance)
-        deleterInstance = new AsyncDeleter;
+void AsyncDeleter::triggerDeleteProcess(void) {
+    if(!deleterInstance){
+        return;
+    }
 
     //! to trigger the event after GUI process is finished execution
     //! this function is used to swap elements from one to next array
@@ -49,12 +49,9 @@ void AsyncDeleter::triggerDeleteProcess(void)
     }
 }
 
-void AsyncDeleter::executeThread(void)
-{
-    while(!exitApplication)
-    {
-        suspendThread();
-
+void AsyncDeleter::executeThread(void) {
+    while(!exitApplication || !realDeleteElements.empty()) {
+        if(realDeleteElements.empty()) suspendThread();
         //! delete elements that require post process deleting
         //! because otherwise they would block or do invalid access on GUI thread
         while(!realDeleteElements.empty())

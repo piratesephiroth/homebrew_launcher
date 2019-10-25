@@ -24,10 +24,11 @@
 class AsyncDeleter : public CThread
 {
 public:
-    static void destroyInstance()
-    {
-        delete deleterInstance;
-        deleterInstance = NULL;
+    static void destroyInstance() {
+        if(deleterInstance != NULL) {
+            delete deleterInstance;
+            deleterInstance = NULL;
+        }
     }
 
     class Element
@@ -37,12 +38,25 @@ public:
         virtual ~Element() {}
     };
 
-    static void pushForDelete(AsyncDeleter::Element *e)
-    {
-        if(!deleterInstance)
+    static void pushForDelete(AsyncDeleter::Element *e) {
+        if(!deleterInstance) {
             deleterInstance = new AsyncDeleter;
-
+        }
         deleterInstance->deleteElements.push(e);
+    }
+
+    static bool deleteListEmpty() {
+        if(!deleterInstance) {
+            return true;
+        }
+        return deleterInstance->deleteElements.empty();
+    }
+
+    static bool realListEmpty() {
+        if(!deleterInstance) {
+            return true;
+        }
+        return deleterInstance->realDeleteElements.empty();
     }
 
     static void triggerDeleteProcess(void);

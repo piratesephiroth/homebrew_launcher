@@ -30,7 +30,7 @@ public:
         return applicationInstance;
     }
     static void destroyInstance() {
-        if(applicationInstance) {
+        if(applicationInstance != NULL) {
             delete applicationInstance;
             applicationInstance = NULL;
         }
